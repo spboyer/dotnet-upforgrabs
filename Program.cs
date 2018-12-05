@@ -22,7 +22,7 @@ namespace upforgrabs
     public int Results { get; set; } = 5;
 
     [Argument(0)]
-    public string Terms { get; set; }
+    public string ProjectName { get; set; }
     private static readonly HttpClient client = new HttpClient { BaseAddress = new Uri("https://shboyer.azureedge.net/up-for-grabs/") };
     private static List<Project> projects = new List<Project>();
     public static int Main(string[] args) =>
@@ -30,15 +30,18 @@ namespace upforgrabs
 
     private void OnExecute(CommandLineApplication app)
     {
-      if (String.IsNullOrEmpty(Terms))
+      if (!String.IsNullOrEmpty(ProjectName))
       {
         app.ShowHelp();
       }
       else
       {
+        // need to add Polly here, within getProjects()
         getProjects().GetAwaiter().GetResult();
-      }
 
+        var selected = RandomArrayEntries(projects.ToArray(), Results);
+        var chosen = ShowPicker(selected);
+      }
     }
 
     private static async Task getProjects()
@@ -66,12 +69,12 @@ namespace upforgrabs
       return false;
     }
 
-    private static Stack ShuffleProjects()
+    private static Stack ShuffleProjects(IEnumerable<Project> values)
     {
       var random = new Random();
       var stack = new Stack();
-      var list = new List<Project>(projects);
-      while (projects.Count > 0)
+      var list = new List<Project>(values);
+      while (list.Count > 0)
       {
         var randomIndex = random.Next(0, list.Count);
         var randomItem = list[randomIndex];
@@ -82,6 +85,91 @@ namespace upforgrabs
 
       return stack;
     }
+
+    private static Project[] RandomArrayEntries(Project[] arrayItems, int count)
+    {
+      var listToReturn = new List<Project>();
+
+      if (arrayItems.Length != count)
+      {
+        var deck = ShuffleProjects(projects);
+
+        for (var i = 0; i < count; i++)
+        {
+          var item = deck.Pop() as Project;
+          listToReturn.Add(item);
+        }
+
+        return listToReturn.ToArray();
+      }
+
+      return arrayItems;
+    }
+
+    private static Project ShowPicker(Project[] projects)
+    {
+
+      Console.WriteLine("Please select a project:");
+      int left = Console.CursorLeft;
+      int top = Console.CursorTop;
+
+      void WriteList(int item)
+      {
+        Console.SetCursorPosition(left, top);
+        for (var i=0; i < projects.Length;i++)
+        {
+          if (i == item)
+            Console.Write("> ");
+
+          Console.WriteLine($"{@i + 1}. {@projects[i].name.PadRight(100, Convert.ToChar(" "))}");
+        }
+
+
+      }
+
+      Project GetSelected(int s)
+      {
+        return projects[s];
+      }
+
+      Project selected = null;
+      int indicator = 0;
+      ConsoleKeyInfo info = new ConsoleKeyInfo();
+
+      while(selected == null)
+      {
+        if (info.Key == ConsoleKey.DownArrow)
+        {
+          indicator += 1;
+          if (indicator == projects.Length)
+            indicator = 0;
+        }
+
+        if (info.Key == ConsoleKey.UpArrow)
+        {
+          indicator -= 1;
+          if (indicator < 0)
+            indicator = projects.Length - 1;
+        }
+
+        if (info.Key == ConsoleKey.Enter)
+        {
+          selected = GetSelected(indicator);
+          break;
+        }
+
+        int line = -1;
+        if (int.TryParse(info.KeyChar.ToString(),out line) && line <= projects.Length)
+        {
+          selected = GetSelected(line - 1);
+          break;
+        }
+
+        WriteList(indicator);
+        info = Console.ReadKey();
+      }
+
+      return selected;
+    }
   }
 }
-
