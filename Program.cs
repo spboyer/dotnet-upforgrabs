@@ -137,10 +137,21 @@ namespace upforgrabs
         for (var i = 0; i < projects.Length; i++)
         {
           if (i == item)
+          {
+            Console.ForegroundColor = ConsoleColor.DarkCyan;
             Console.Write("> ");
+          }
+          else
+          {
+            Console.ResetColor();
+          }
 
           Console.WriteLine($"{@i + 1}. {@projects[i].name.PadRight(100, Convert.ToChar(" "))}");
         }
+
+        Console.ForegroundColor = ConsoleColor.Gray;
+        Console.WriteLine("(Use up/down to navigate, # or Enter to select.)");
+        Console.ResetColor();
       }
 
       Project GetSelected(int s)
@@ -193,6 +204,9 @@ namespace upforgrabs
 
       Spinner.Start($"Getting random issue for {project.name}", spinner =>
        {
+         if (project.site.EndsWith("/"))
+           project.site = project.site.TrimEnd(Convert.ToChar("/"));
+
          var parts = project.site.Split(Convert.ToChar("/"));
          var owner = parts[parts.Length - 2];
          var repoName = parts[parts.Length - 1];
@@ -203,14 +217,29 @@ namespace upforgrabs
            State = ItemStateFilter.Open,
          };
          requestIssues.Labels.Add(project.upforgrabs.name);
-         var issues = client.Issue.GetAllForRepository(owner, repoName, requestIssues).GetAwaiter().GetResult();
-         spinner.Succeed();
+         try
+         {
+           var issues = client.Issue.GetAllForRepository(owner, repoName, requestIssues).GetAwaiter().GetResult();
 
-         var rand = new Random(issues.Count);
-         var item = issues.OrderBy(s => rand.NextDouble()).First();
+           if (issues.Count == 0)
+           {
+             spinner.Fail($"{project.name} currently has 0 open issues for {project.upforgrabs.name}");
+           }
+           else
+           {
+             spinner.Succeed();
 
-         Console.WriteLine(item.Title);
-         Console.WriteLine(item.Url);
+             var rand = new Random(issues.Count);
+             var item = issues.OrderBy(s => rand.NextDouble()).First();
+
+             Console.WriteLine(item.Title);
+             Console.WriteLine(item.Url);
+           }
+         }
+         catch (Exception)
+         {
+           spinner.Fail($"Something went wrong trying to get issues for repo:{project.site}. {Environment.NewLine}[DebugInfo: site:{project.site} {Environment.NewLine}owner:{owner} {Environment.NewLine}repoName:{repoName}]");
+         }
        });
     }
 
