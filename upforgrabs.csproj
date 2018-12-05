@@ -10,8 +10,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Kurukuru" Version="1.0.0" />
     <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="2.2.5" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />
+    <PackageReference Include="Octokit" Version="0.32.0" />
   </ItemGroup>
 
 </Project>

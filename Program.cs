@@ -6,6 +6,9 @@ using Newtonsoft.Json;
 using McMaster.Extensions.CommandLineUtils;
 using System.ComponentModel.DataAnnotations;
 using System.Collections;
+using Kurukuru;
+using Octokit;
+using System.Linq;
 
 namespace upforgrabs
 {
@@ -36,14 +39,26 @@ namespace upforgrabs
       }
       else
       {
-        // need to add Polly here, within getProjects()
-        getProjects().GetAwaiter().GetResult();
+        Spinner.Start("Getting .NET Open Source Projects", spinner =>
+        {
+          getProjects().GetAwaiter().GetResult();
+          spinner.Succeed();
 
-        var selected = RandomArrayEntries(projects.ToArray(), Results);
-        var chosen = ShowPicker(selected);
+          var selected = RandomArrayEntries(projects.ToArray(), Results);
+          var chosen = ShowPicker(selected);
+
+          Console.WriteLine();
+          Console.WriteLine();
+          Console.WriteLine(chosen.name);
+          Console.WriteLine(chosen.desc);
+          Console.WriteLine(chosen.site);
+          Console.WriteLine();
+
+          GetRandomIssue(chosen);
+
+        });
       }
     }
-
     private static async Task getProjects()
     {
       using (var response = await client.GetAsync("projects.json"))
@@ -109,22 +124,23 @@ namespace upforgrabs
     private static Project ShowPicker(Project[] projects)
     {
 
+      Console.WriteLine();
       Console.WriteLine("Please select a project:");
+      Console.WriteLine();
+
       int left = Console.CursorLeft;
       int top = Console.CursorTop;
 
       void WriteList(int item)
       {
         Console.SetCursorPosition(left, top);
-        for (var i=0; i < projects.Length;i++)
+        for (var i = 0; i < projects.Length; i++)
         {
           if (i == item)
             Console.Write("> ");
 
           Console.WriteLine($"{@i + 1}. {@projects[i].name.PadRight(100, Convert.ToChar(" "))}");
         }
-
-
       }
 
       Project GetSelected(int s)
@@ -136,7 +152,7 @@ namespace upforgrabs
       int indicator = 0;
       ConsoleKeyInfo info = new ConsoleKeyInfo();
 
-      while(selected == null)
+      while (selected == null)
       {
         if (info.Key == ConsoleKey.DownArrow)
         {
@@ -159,7 +175,7 @@ namespace upforgrabs
         }
 
         int line = -1;
-        if (int.TryParse(info.KeyChar.ToString(),out line) && line <= projects.Length)
+        if (int.TryParse(info.KeyChar.ToString(), out line) && line <= projects.Length)
         {
           selected = GetSelected(line - 1);
           break;
@@ -171,5 +187,32 @@ namespace upforgrabs
 
       return selected;
     }
+
+    private static void GetRandomIssue(Project project)
+    {
+
+      Spinner.Start($"Getting random issue for {project.name}", spinner =>
+       {
+         var parts = project.site.Split(Convert.ToChar("/"));
+         var owner = parts[parts.Length - 2];
+         var repoName = parts[parts.Length - 1];
+
+         var client = new GitHubClient(new ProductHeaderValue("dotnet-upforgrabs"));
+         var requestIssues = new RepositoryIssueRequest
+         {
+           State = ItemStateFilter.Open,
+         };
+         requestIssues.Labels.Add(project.upforgrabs.name);
+         var issues = client.Issue.GetAllForRepository(owner, repoName, requestIssues).GetAwaiter().GetResult();
+         spinner.Succeed();
+
+         var rand = new Random(issues.Count);
+         var item = issues.OrderBy(s => rand.NextDouble()).First();
+
+         Console.WriteLine(item.Title);
+         Console.WriteLine(item.Url);
+       });
+    }
+
   }
 }
