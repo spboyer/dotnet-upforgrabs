@@ -7,7 +7,7 @@ Not sure what project needs help? Or where to start?
 Install .NET Core 2.2 from https://dot.net and then install `dotnet-upforgrabs`
 
 ```console
-dotnet tool install -g dotnet-upforgrabs
+dotnet tool install -g upforgrabs
 ```
 
 Open your favorite terminal and run.
