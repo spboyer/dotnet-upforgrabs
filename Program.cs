@@ -35,7 +35,16 @@ namespace upforgrabs
     {
       if (!String.IsNullOrEmpty(ProjectName))
       {
-        app.ShowHelp();
+        getProjects().GetAwaiter().GetResult();
+        var selected = projects.Where(p => p.name.Equals(ProjectName, StringComparison.CurrentCultureIgnoreCase)).FirstOrDefault();
+        if(selected != null)
+        {
+          GetRandomIssue(selected);
+        }
+        else
+        {
+          Console.WriteLine($"{ProjectName} not found in list.");
+        }
       }
       else
       {
