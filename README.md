@@ -26,8 +26,10 @@ Arguments:
 
 Options:
   -?|-h|--help           Show help information
+  -o|--open              Auto open the selected issue
   -l|--lucky             Open first result
   -n|--number <RESULTS>  Number of results 1 - 25
+
 ```
 
 Use the arrow keys to navigate the project selector and hit `<Enter>` or the cooresponding `#` to choose the project.

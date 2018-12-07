@@ -9,6 +9,8 @@ using System.Collections;
 using Kurukuru;
 using Octokit;
 using System.Linq;
+using System.Diagnostics;
+using System.Runtime.InteropServices;
 
 namespace upforgrabs
 {
@@ -16,6 +18,8 @@ namespace upforgrabs
   [Command(ThrowOnUnexpectedArgument = false)]
   class Program
   {
+    [Option(Description = "Auto open the selected issue", LongName = "open", ShortName = "o")]
+    public bool Open { get; set; } = false;
 
     [Option(Description = "Open first result", LongName = "lucky", ShortName = "l")]
     public bool Lucky { get; set; } = false;
@@ -39,7 +43,7 @@ namespace upforgrabs
         var selected = projects.Where(p => p.name.Equals(ProjectName, StringComparison.CurrentCultureIgnoreCase)).FirstOrDefault();
         if(selected != null)
         {
-          GetRandomIssue(selected);
+          GetRandomIssue(selected, Open);
         }
         else
         {
@@ -64,7 +68,7 @@ namespace upforgrabs
           {
             chosen = selected.First();
           }
-            GetRandomIssue(chosen);
+            GetRandomIssue(chosen, Open);
         });
       }
     }
@@ -207,7 +211,7 @@ namespace upforgrabs
 
       return selected;
     }
-    private static void GetRandomIssue(Project project)
+    private static void GetRandomIssue(Project project, bool open)
     {
       Spinner.Start($"Getting random issue for {project.name}", spinner =>
        {
@@ -269,13 +273,36 @@ namespace upforgrabs
              Console.ResetColor();
              Console.WriteLine();
 
-
+             var url = $"https://github.com/{owner}/{repoName}/issues/{item.Number.ToString()}";
              Console.Write("Start now: ");
              Console.ForegroundColor = ConsoleColor.DarkCyan;
-             Console.WriteLine($"https://github.com/{owner}/{repoName}/issues/{item.Number.ToString()}");
+             Console.WriteLine(url);
              Console.WriteLine();
              Console.ResetColor();
 
+             if (open)
+             {
+                OpenResult(url);
+             }
+             else
+             {
+               string test = string.Empty;
+               Console.WriteLine($"{Environment.NewLine}Open issue to get started? (Y/N)");
+               ConsoleKeyInfo answer = new ConsoleKeyInfo();
+               while (string.IsNullOrEmpty(test))
+               {
+                 answer = Console.ReadKey();
+
+                 if (answer.Key == ConsoleKey.Y)
+                 {
+                   OpenResult(url);
+                   test = "yes";
+                 }
+
+                  if (answer.Key == ConsoleKey.N)
+                   test = "no";
+               }
+             }
            }
          }
          catch (Exception)
@@ -283,6 +310,29 @@ namespace upforgrabs
            spinner.Fail($"Something went wrong trying to get issues for repo:{project.site}. {Environment.NewLine}[DebugInfo: site:{project.site} {Environment.NewLine}owner:{owner} {Environment.NewLine}repoName:{repoName}]");
          }
        });
+    }
+
+    private static void OpenResult(string url)
+    {
+      var cmd = "open";
+
+      if (System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+      {
+        cmd = "xdg-open";
+        Process.Start(new ProcessStartInfo(cmd, url));
+      }
+
+      if (System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+      {
+        cmd = "open";
+        Process.Start(new ProcessStartInfo(cmd, url));
+      }
+
+      if (System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+      {
+        cmd = "start";
+        Process.Start(cmd, url);
+      }
     }
 
   }
