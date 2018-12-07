@@ -18,7 +18,7 @@ namespace upforgrabs
   {
 
     [Option(Description = "Open first result", LongName = "lucky", ShortName = "l")]
-    public bool Lucky { get; set; } = true;
+    public bool Lucky { get; set; } = false;
 
     [Option(Description = "Number of results 1 - 25", LongName = "number", ShortName = "n")]
     [Range(1, 25)]
@@ -54,10 +54,17 @@ namespace upforgrabs
           spinner.Succeed();
 
           var selected = RandomArrayEntries(projects.ToArray(), Results);
-          var chosen = ShowPicker(selected);
+          Project chosen = null;
 
-          GetRandomIssue(chosen);
-
+          if (!Lucky)
+          {
+            chosen = ShowPicker(selected);
+          }
+          else
+          {
+            chosen = selected.First();
+          }
+            GetRandomIssue(chosen);
         });
       }
     }

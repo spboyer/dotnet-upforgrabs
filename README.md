@@ -16,9 +16,23 @@ Open your favorite terminal and run.
 upforgrabs
 ```
 
+`upforgrabs -h` for options.
+
+```console
+Usage: upforgrabs [arguments] [options]
+
+Arguments:
+  ProjectName
+
+Options:
+  -?|-h|--help           Show help information
+  -l|--lucky             Open first result
+  -n|--number <RESULTS>  Number of results 1 - 25
+```
+
 Use the arrow keys to navigate the project selector and hit `<Enter>` or the cooresponding `#` to choose the project.
 
-![gif of selecting project]()
+![gif of selecting project](docs/examples.gif)
 
 If there are no current items open in the selected project, you will be presented with a message similar to this.
 
