@@ -47,13 +47,6 @@ namespace upforgrabs
           var selected = RandomArrayEntries(projects.ToArray(), Results);
           var chosen = ShowPicker(selected);
 
-          Console.WriteLine();
-          Console.WriteLine();
-          Console.WriteLine(chosen.name);
-          Console.WriteLine(chosen.desc);
-          Console.WriteLine(chosen.site);
-          Console.WriteLine();
-
           GetRandomIssue(chosen);
 
         });
@@ -120,7 +113,6 @@ namespace upforgrabs
 
       return arrayItems;
     }
-
     private static Project ShowPicker(Project[] projects)
     {
 
@@ -151,6 +143,7 @@ namespace upforgrabs
 
         Console.ForegroundColor = ConsoleColor.Gray;
         Console.WriteLine("(Use up/down to navigate, # or Enter to select.)");
+        Console.WriteLine();
         Console.ResetColor();
       }
 
@@ -198,10 +191,8 @@ namespace upforgrabs
 
       return selected;
     }
-
     private static void GetRandomIssue(Project project)
     {
-
       Spinner.Start($"Getting random issue for {project.name}", spinner =>
        {
          if (project.site.EndsWith("/"))
@@ -232,8 +223,43 @@ namespace upforgrabs
              var rand = new Random(issues.Count);
              var item = issues.OrderBy(s => rand.NextDouble()).First();
 
-             Console.WriteLine(item.Title);
-             Console.WriteLine(item.Url);
+             Console.WriteLine();
+             Console.Write("UpForGrabs Issue for ");
+             Console.ForegroundColor = ConsoleColor.Yellow;
+             Console.WriteLine($"{project.name}");
+             Console.ResetColor();
+             Console.WriteLine();
+
+             Console.Write("   - Title: ");
+             Console.ForegroundColor = ConsoleColor.Yellow;
+             Console.WriteLine($"{item.Title}");
+             Console.Write("");
+             Console.ForegroundColor = ConsoleColor.Yellow;
+             Console.ResetColor();
+
+             Console.Write("   - Repository: ");
+             Console.ForegroundColor = ConsoleColor.Yellow;
+             Console.WriteLine($"{owner}/{repoName}");
+             Console.ResetColor();
+
+             Console.Write("   - Issue: #");
+             Console.ForegroundColor = ConsoleColor.Yellow;
+             Console.WriteLine($"{item.Number.ToString()}");
+             Console.ResetColor();
+
+             Console.Write("   - Status: ");
+             Console.ForegroundColor = ConsoleColor.Yellow;
+             Console.WriteLine($"{item.State.StringValue}");
+             Console.ResetColor();
+             Console.WriteLine();
+
+
+             Console.Write("Start now: ");
+             Console.ForegroundColor = ConsoleColor.DarkCyan;
+             Console.WriteLine($"https://github.com/{owner}/{repoName}/issues/{item.Number.ToString()}");
+             Console.WriteLine();
+             Console.ResetColor();
+
            }
          }
          catch (Exception)
