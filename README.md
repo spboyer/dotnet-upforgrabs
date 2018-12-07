@@ -1,1 +1,31 @@
 # dotnet-upforgrabs
+
+Welcome to the .NET Core Global Tool to help you get started with contributing to Open Source projects.
+
+Not sure what project needs help? Or where to start?
+
+Install .NET Core 2.2 from https://dot.net and then install `dotnet-upforgrabs`
+
+```console
+dotnet tool install -g dotnet-upforgrabs
+```
+
+Open your favorite terminal and run.
+
+```console
+upforgrabs
+```
+
+Use the arrow keys to navigate the project selector and hit `<Enter>` or the cooresponding `#` to choose the project.
+
+![gif of selecting project]()
+
+If there are no current items open in the selected project, you will be presented with a message similar to this.
+
+![no issues found](docs/no-issues.png)
+
+otherwise a random issue is presented. Most terminals allow for clicking via CMD+Click or Ctrl+Click to open the URL. Or you may copy paste into a browser to get started.
+
+![random issue](docs/random-issue.png)
+
+Enjoy! And go contribute!
