@@ -1,5 +1,7 @@
 # dotnet-upforgrabs
 
+Related blog: https://tattoocoder.com/finding-your-next-net-open-source-project-using-the-command-line/
+
 Welcome to the .NET Core Global Tool to help you get started with contributing to Open Source projects.
 
 Not sure what project needs help? Or where to start?
