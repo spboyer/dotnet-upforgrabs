@@ -28,10 +28,19 @@ namespace upforgrabs
     [Range(1, 25)]
     public int Results { get; set; } = 5;
 
+    [Option(Description = "Select a .NET programming language (csharp, c#, fsharp, f#)", LongName = "language", ShortName = "lang")]
+    [RegularExpression("c#|f#|csharp|fsharp|", ErrorMessage = "The language must be a .NET programming language")]
+    public string Language { get; set; }
+
     [Argument(0)]
     public string ProjectName { get; set; }
     private static readonly HttpClient client = new HttpClient { BaseAddress = new Uri("https://shboyer.azureedge.net/up-for-grabs/") };
     private static List<Project> projects = new List<Project>();
+    private static IEnumerable<string> searchFor = new List<string> { ".net", "c#", "f#", "dotnet", "csharp", "fsharp" };
+    private static readonly IEnumerable<(string firstLang, string secondLang)> Langs = new List<(string firstLang, string secondLang)>
+    {
+        ("c#", "csharp"), ("f#", "fsharp")
+    };
     public static int Main(string[] args) =>
         CommandLineApplication.Execute<Program>(args);
 
@@ -60,6 +69,11 @@ namespace upforgrabs
           var selected = RandomArrayEntries(projects.ToArray(), Results);
           Project chosen = null;
 
+          if(!string.IsNullOrWhiteSpace(Language))
+          {
+            searchFor = GetLangs(Language.ToLowerInvariant());
+          }
+
           if (!Lucky)
           {
             chosen = ShowPicker(selected);
@@ -71,6 +85,14 @@ namespace upforgrabs
             GetRandomIssue(chosen, Open);
         });
       }
+    }
+    private static IEnumerable<string> GetLangs(string language)
+    {
+      var langs = Langs
+      .Where(x => x.firstLang == language || x.secondLang == language)
+      .Select(x => new List<string> { x.firstLang, x.secondLang })
+      .Single();
+      return searchFor.Where(y => langs.Contains(y) || y == "dotnet" || y == ".net");
     }
     private static async Task getProjects()
     {
@@ -85,7 +107,6 @@ namespace upforgrabs
     private static bool FindProjectsWithTags(List<string> tags)
     {
       var stringComparison = StringComparison.CurrentCultureIgnoreCase;
-      var searchFor = new string[] { ".net", "c#", "f#", "dotnet", "csharp", "fsharp" };
       foreach (var t in tags)
       {
         foreach (var s in searchFor)

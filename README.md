@@ -31,7 +31,7 @@ Options:
   -o|--open              Auto open the selected issue
   -l|--lucky             Open first result
   -n|--number <RESULTS>  Number of results 1 - 25
-
+  -lang|--language <LANGUAGE> Select a .NET programming language (csharp, c#, fsharp, f#)
 ```
 
 Use the arrow keys to navigate the project selector and hit `<Enter>` or the cooresponding `#` to choose the project.
