@@ -1,5 +1,7 @@
 # dotnet-upforgrabs
 
+[![Build status](https://ci.appveyor.com/api/projects/status/4mtw6mqe74ihhbp7?svg=true)](https://ci.appveyor.com/project/spboyer/dotnet-upforgrabs)
+
 Related blog: https://tattoocoder.com/finding-your-next-net-open-source-project-using-the-command-line/
 
 Welcome to the .NET Core Global Tool to help you get started with contributing to Open Source projects.
