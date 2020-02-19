@@ -8,7 +8,7 @@ Welcome to the .NET Core Global Tool to help you get started with contributing t
 
 Not sure what project needs help? Or where to start?
 
-Install .NET Core 2.2 from https://dot.net and then install `upforgrabs`
+Install .NET Core 3.1 from https://dot.net and then install `upforgrabs`
 
 ```console
 dotnet tool install -g upforgrabs
