@@ -100,7 +100,7 @@ namespace upforgrabs
             {
                 var raw = await response.Content.ReadAsStringAsync();
                 projects = JsonConvert.DeserializeObject<List<Project>>(raw)
-                .FindAll(p => FindProjectsWithTags(p.tags));
+                .FindAll(p => FindProjectsWithTags(p.tags) && p.site.StartsWith("https://github.com"));
             }
         }
 
