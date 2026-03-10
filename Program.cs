@@ -34,7 +34,7 @@ namespace upforgrabs
 
         [Argument(0)]
         public string ProjectName { get; set; }
-        private static readonly HttpClient client = new HttpClient { BaseAddress = new Uri("https://shboyer.azureedge.net/up-for-grabs/") };
+        private static readonly HttpClient client = new HttpClient { BaseAddress = new Uri("https://up-for-grabs.net/") };
         private static List<Project> projects = new List<Project>();
         private static IEnumerable<string> searchFor = new List<string> { ".net", "c#", "f#", "dotnet", "csharp", "fsharp" };
         private static readonly IEnumerable<(string firstLang, string secondLang)> Langs = new List<(string firstLang, string secondLang)>
@@ -96,7 +96,7 @@ namespace upforgrabs
         }
         private static async Task getProjects()
         {
-            using (var response = await client.GetAsync("projects.json"))
+            using (var response = await client.GetAsync("javascripts/projects.json"))
             {
                 var raw = await response.Content.ReadAsStringAsync();
                 projects = JsonConvert.DeserializeObject<List<Project>>(raw)
